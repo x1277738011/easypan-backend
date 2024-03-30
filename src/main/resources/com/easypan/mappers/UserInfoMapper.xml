@@ -1,403 +1,507 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.easypan.mappers.UserInfoMapper">
 
 	<!--实体映射-->
 	<resultMap id="base_result_map" type="com.easypan.entity.po.UserInfo">
 		<!--用户ID-->
-		<id column="user_id" property="userId"  />
-		<!--用户名-->
-		<result column="user_name" property="userName"  />
-		<!---->
-		<result column="phone" property="phone"  />
+		<result column="user_id" property="userId"/>
+		<!--昵称-->
+		<result column="nick_name" property="nickName"/>
+		<!--邮箱-->
+		<result column="email" property="email"/>
+		<!--qqOpenID-->
+		<result column="qq_open_id" property="qqOpenId"/>
+		<!--qq头像-->
+		<result column="qq_avatar" property="qqAvatar"/>
 		<!--密码-->
-		<result column="password" property="password"  />
-		<!--出生年月-->
-		<result column="birthday" property="birthday"  />
-		<!--性别 0:女 1:男-->
-		<result column="sex" property="sex"  />
-		<!--职位0:程序员 1:测试  2:产品经理-->
-		<result column="position" property="position"  />
-		<!--角色 0:普通用户 1:组长 2:经理 3:管理员 可多选-->
-		<result column="roles" property="roles"  />
-		<!--创建时间-->
-		<result column="create_time" property="createTime"  />
+		<result column="password" property="password"/>
+		<!--加入时间-->
+		<result column="join_time" property="joinTime"/>
+		<!--最后登录时间-->
+		<result column="last_login_time" property="lastLoginTime"/>
+		<!--0:禁用 1:正常-->
+		<result column="status" property="status"/>
+		<!--使用空间单位byte-->
+		<result column="use_space" property="useSpace"/>
+		<!--总空间-->
+		<result column="total_space" property="totalSpace"/>
 	</resultMap>
 
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
-		 user_id,user_name,phone,password,birthday,
-		 sex,position,roles,create_time
+		user_id
+		,nick_name,email,qq_open_id,qq_avatar,
+		password,join_time,last_login_time,status,use_space,
+		total_space
 	</sql>
 
 	<sql id="base_condition_filed">
-		<if test="query.userId != null">
-			 and  user_id = #{query.userId}
+		<if test="query.userId != null and query.userId!=''">
+			and user_id = #{query.userId}
 		</if>
-		<if test="query.userName != null and query.userName!=''">
-			 and  user_name = #{query.userName}
+		<if test="query.nickName != null and query.nickName!=''">
+			and nick_name = #{query.nickName}
 		</if>
-		<if test="query.phone != null and query.phone!=''">
-			 and  phone = #{query.phone}
+		<if test="query.email != null and query.email!=''">
+			and email = #{query.email}
+		</if>
+		<if test="query.qqOpenId != null and query.qqOpenId!=''">
+			and qq_open_id = #{query.qqOpenId}
+		</if>
+		<if test="query.qqAvatar != null and query.qqAvatar!=''">
+			and qq_avatar = #{query.qqAvatar}
 		</if>
 		<if test="query.password != null and query.password!=''">
-			 and  password = #{query.password}
+			and password = #{query.password}
 		</if>
-		<if test="query.birthday != null and query.birthday!=''">
-			 <![CDATA[ and  birthday=str_to_date(#{query.birthday}, '%Y-%m-%d') ]]>
+		<if test="query.joinTime != null and query.joinTime!=''">
+			<![CDATA[ and  join_time=str_to_date(#{query.joinTime}, '%Y-%m-%d') ]]>
 		</if>
-		<if test="query.sex != null">
-			 and  sex = #{query.sex}
+		<if test="query.lastLoginTime != null and query.lastLoginTime!=''">
+			<![CDATA[ and  last_login_time=str_to_date(#{query.lastLoginTime}, '%Y-%m-%d') ]]>
 		</if>
-		<if test="query.position != null">
-			 and  position = #{query.position}
+		<if test="query.status != null">
+			and status = #{query.status}
 		</if>
-		<if test="query.roles != null and query.roles!=''">
-			 and  roles = #{query.roles}
+		<if test="query.useSpace != null">
+			and use_space = #{query.useSpace}
 		</if>
-		<if test="query.createTime != null and query.createTime!=''">
-			 <![CDATA[ and  create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
+		<if test="query.totalSpace != null">
+			and total_space = #{query.totalSpace}
 		</if>
+	</sql>
+	<!-- 通用条件列-->
+	<sql id="base_condition">
+		<where>
+			<include refid="base_condition_filed"/>
+		</where>
 	</sql>
 
 	<!-- 通用查询条件列-->
 	<sql id="query_condition">
 		<where>
-			<include refid="base_condition_filed" />
-			<if test="query.userNameFuzzy!= null  and query.userNameFuzzy!=''">
-				 and  user_name like concat('%', #{query.userNameFuzzy}, '%')
+			<include refid="base_condition_filed"/>
+			<if test="query.userIdFuzzy!= null  and query.userIdFuzzy!=''">
+				and user_id like concat('%', #{query.userIdFuzzy}, '%')
 			</if>
-			<if test="query.phoneFuzzy!= null  and query.phoneFuzzy!=''">
-				 and  phone like concat('%', #{query.phoneFuzzy}, '%')
+			<if test="query.nickNameFuzzy!= null  and query.nickNameFuzzy!=''">
+				and nick_name like concat('%', #{query.nickNameFuzzy}, '%')
+			</if>
+			<if test="query.emailFuzzy!= null  and query.emailFuzzy!=''">
+				and email like concat('%', #{query.emailFuzzy}, '%')
+			</if>
+			<if test="query.qqOpenIdFuzzy!= null  and query.qqOpenIdFuzzy!=''">
+				and qq_open_id like concat('%', #{query.qqOpenIdFuzzy}, '%')
+			</if>
+			<if test="query.qqAvatarFuzzy!= null  and query.qqAvatarFuzzy!=''">
+				and qq_avatar like concat('%', #{query.qqAvatarFuzzy}, '%')
 			</if>
 			<if test="query.passwordFuzzy!= null  and query.passwordFuzzy!=''">
-				 and  password like concat('%', #{query.passwordFuzzy}, '%')
+				and password like concat('%', #{query.passwordFuzzy}, '%')
 			</if>
-			<if test="query.birthdayStart!= null and query.birthdayStart!=''">
-				 <![CDATA[ and  birthday>=str_to_date(#{query.birthdayStart}, '%Y-%m-%d') ]]>
+			<if test="query.joinTimeStart!= null and query.joinTimeStart!=''">
+				<![CDATA[ and  join_time>=str_to_date(#{query.joinTimeStart}, '%Y-%m-%d') ]]>
 			</if>
-			<if test="query.birthdayEnd!= null and query.birthdayEnd!=''">
-				 <![CDATA[ and  birthday< date_sub(str_to_date(#{query.birthdayEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			<if test="query.joinTimeEnd!= null and query.joinTimeEnd!=''">
+				<![CDATA[ and  join_time< date_sub(str_to_date(#{query.joinTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
 			</if>
-			<if test="query.rolesFuzzy!= null  and query.rolesFuzzy!=''">
-				 and  roles like concat('%', #{query.rolesFuzzy}, '%')
+			<if test="query.lastLoginTimeStart!= null and query.lastLoginTimeStart!=''">
+				<![CDATA[ and  last_login_time>=str_to_date(#{query.lastLoginTimeStart}, '%Y-%m-%d') ]]>
 			</if>
-			<if test="query.createTimeStart!= null and query.createTimeStart!=''">
-				 <![CDATA[ and  create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
-			</if>
-			<if test="query.createTimeEnd!= null and query.createTimeEnd!=''">
-				 <![CDATA[ and  create_time< date_sub(str_to_date(#{query.createTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			<if test="query.lastLoginTimeEnd!= null and query.lastLoginTimeEnd!=''">
+				<![CDATA[ and  last_login_time< date_sub(str_to_date(#{query.lastLoginTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
 			</if>
 		</where>
 	</sql>
 
 	<!-- 查询集合-->
-	<select id="selectList" resultMap="base_result_map" >
-		 SELECT <include refid="base_column_list" /> FROM user_info <include refid="query_condition" />
-		 <if test="query.orderBy!=null">
-			 order by ${query.orderBy}
-		 </if>
-		 <if test="query.simplePage!=null">
-			 limit #{query.simplePage.start},#{query.simplePage.end}
-		 </if>
+	<select id="selectList" resultMap="base_result_map">
+		SELECT
+		<include refid="base_column_list"/>
+		FROM user_info
+		<include refid="query_condition"/>
+		<if test="query.orderBy!=null">
+			order by ${query.orderBy}
+		</if>
+		<if test="query.simplePage!=null">
+			limit #{query.simplePage.start},#{query.simplePage.end}
+		</if>
 	</select>
 
 	<!-- 查询数量-->
-	<select id="selectCount" resultType="java.lang.Integer" >
-		 SELECT count(1) FROM user_info <include refid="query_condition" />
+	<select id="selectCount" resultType="java.lang.Integer">
+		SELECT count(1) FROM user_info
+		<include refid="query_condition"/>
 	</select>
 
 	<!-- 插入 （匹配有值的字段）-->
 	<insert id="insert" parameterType="com.easypan.entity.po.UserInfo">
-		<selectKey keyProperty="bean.userId" resultType="Integer" order="AFTER">
-			SELECT LAST_INSERT_ID()
-		</selectKey>
-		 INSERT INTO user_info
-		 <trim prefix="(" suffix=")" suffixOverrides="," >
-			<if test="bean.userName != null">
-				 user_name,
+		INSERT INTO user_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.userId != null">
+				user_id,
 			</if>
-			<if test="bean.phone != null">
-				 phone,
+			<if test="bean.nickName != null">
+				nick_name,
+			</if>
+			<if test="bean.email != null">
+				email,
+			</if>
+			<if test="bean.qqOpenId != null">
+				qq_open_id,
+			</if>
+			<if test="bean.qqAvatar != null">
+				qq_avatar,
 			</if>
 			<if test="bean.password != null">
-				 password,
+				password,
 			</if>
-			<if test="bean.birthday != null">
-				 birthday,
+			<if test="bean.joinTime != null">
+				join_time,
 			</if>
-			<if test="bean.sex != null">
-				 sex,
+			<if test="bean.lastLoginTime != null">
+				last_login_time,
 			</if>
-			<if test="bean.position != null">
-				 position,
+			<if test="bean.status != null">
+				status,
 			</if>
-			<if test="bean.roles != null">
-				 roles,
+			<if test="bean.useSpace != null">
+				use_space,
 			</if>
-			<if test="bean.createTime != null">
-				 create_time,
+			<if test="bean.totalSpace != null">
+				total_space,
 			</if>
-		 </trim>
-		 <trim prefix="values (" suffix=")" suffixOverrides="," >
-			<if test="bean.userName!=null">
-				 #{bean.userName},
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.userId!=null">
+				#{bean.userId},
 			</if>
-			<if test="bean.phone!=null">
-				 #{bean.phone},
+			<if test="bean.nickName!=null">
+				#{bean.nickName},
+			</if>
+			<if test="bean.email!=null">
+				#{bean.email},
+			</if>
+			<if test="bean.qqOpenId!=null">
+				#{bean.qqOpenId},
+			</if>
+			<if test="bean.qqAvatar!=null">
+				#{bean.qqAvatar},
 			</if>
 			<if test="bean.password!=null">
-				 #{bean.password},
+				#{bean.password},
 			</if>
-			<if test="bean.birthday!=null">
-				 #{bean.birthday},
+			<if test="bean.joinTime!=null">
+				#{bean.joinTime},
 			</if>
-			<if test="bean.sex!=null">
-				 #{bean.sex},
+			<if test="bean.lastLoginTime!=null">
+				#{bean.lastLoginTime},
 			</if>
-			<if test="bean.position!=null">
-				 #{bean.position},
+			<if test="bean.status!=null">
+				#{bean.status},
 			</if>
-			<if test="bean.roles!=null">
-				 #{bean.roles},
+			<if test="bean.useSpace!=null">
+				#{bean.useSpace},
 			</if>
-			<if test="bean.createTime!=null">
-				 #{bean.createTime},
+			<if test="bean.totalSpace!=null">
+				#{bean.totalSpace},
 			</if>
-		 </trim>
+		</trim>
 	</insert>
 
 	<!-- 插入或者更新 （匹配有值的字段）-->
 	<insert id="insertOrUpdate" parameterType="com.easypan.entity.po.UserInfo">
-		 INSERT INTO user_info
-		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		INSERT INTO user_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="bean.userId != null">
-				 user_id,
+				user_id,
 			</if>
-			<if test="bean.userName != null">
-				 user_name,
+			<if test="bean.nickName != null">
+				nick_name,
 			</if>
-			<if test="bean.phone != null">
-				 phone,
+			<if test="bean.email != null">
+				email,
+			</if>
+			<if test="bean.qqOpenId != null">
+				qq_open_id,
+			</if>
+			<if test="bean.qqAvatar != null">
+				qq_avatar,
 			</if>
 			<if test="bean.password != null">
-				 password,
+				password,
 			</if>
-			<if test="bean.birthday != null">
-				 birthday,
+			<if test="bean.joinTime != null">
+				join_time,
 			</if>
-			<if test="bean.sex != null">
-				 sex,
+			<if test="bean.lastLoginTime != null">
+				last_login_time,
 			</if>
-			<if test="bean.position != null">
-				 position,
+			<if test="bean.status != null">
+				status,
 			</if>
-			<if test="bean.roles != null">
-				 roles,
+			<if test="bean.useSpace != null">
+				use_space,
 			</if>
-			<if test="bean.createTime != null">
-				 create_time,
+			<if test="bean.totalSpace != null">
+				total_space,
 			</if>
-		 </trim>
-		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="bean.userId!=null">
-				 #{bean.userId},
+				#{bean.userId},
 			</if>
-			<if test="bean.userName!=null">
-				 #{bean.userName},
+			<if test="bean.nickName!=null">
+				#{bean.nickName},
 			</if>
-			<if test="bean.phone!=null">
-				 #{bean.phone},
+			<if test="bean.email!=null">
+				#{bean.email},
 			</if>
-			<if test="bean.password!=null">
-				 #{bean.password},
+			<if test="bean.qqOpenId!=null">
+				#{bean.qqOpenId},
 			</if>
-			<if test="bean.birthday!=null">
-				 #{bean.birthday},
-			</if>
-			<if test="bean.sex!=null">
-				 #{bean.sex},
-			</if>
-			<if test="bean.position!=null">
-				 #{bean.position},
-			</if>
-			<if test="bean.roles!=null">
-				 #{bean.roles},
-			</if>
-			<if test="bean.createTime!=null">
-				 #{bean.createTime},
-			</if>
-		 </trim>
-		 on DUPLICATE key update 
-		 <trim prefix="" suffix="" suffixOverrides=",">
-			<if test="bean.userName!=null">
-				 user_name = VALUES(user_name),
-			</if>
-			<if test="bean.phone!=null">
-				 phone = VALUES(phone),
+			<if test="bean.qqAvatar!=null">
+				#{bean.qqAvatar},
 			</if>
 			<if test="bean.password!=null">
-				 password = VALUES(password),
+				#{bean.password},
 			</if>
-			<if test="bean.birthday!=null">
-				 birthday = VALUES(birthday),
+			<if test="bean.joinTime!=null">
+				#{bean.joinTime},
 			</if>
-			<if test="bean.sex!=null">
-				 sex = VALUES(sex),
+			<if test="bean.lastLoginTime!=null">
+				#{bean.lastLoginTime},
 			</if>
-			<if test="bean.position!=null">
-				 position = VALUES(position),
+			<if test="bean.status!=null">
+				#{bean.status},
 			</if>
-			<if test="bean.roles!=null">
-				 roles = VALUES(roles),
+			<if test="bean.useSpace!=null">
+				#{bean.useSpace},
 			</if>
-			<if test="bean.createTime!=null">
-				 create_time = VALUES(create_time),
+			<if test="bean.totalSpace!=null">
+				#{bean.totalSpace},
 			</if>
-		 </trim>
+		</trim>
+		on DUPLICATE key update
+		<trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.userId!=null">
+				user_id = VALUES(user_id),
+			</if>
+			<if test="bean.nickName!=null">
+				nick_name = VALUES(nick_name),
+			</if>
+			<if test="bean.email!=null">
+				email = VALUES(email),
+			</if>
+			<if test="bean.qqOpenId!=null">
+				qq_open_id = VALUES(qq_open_id),
+			</if>
+			<if test="bean.qqAvatar!=null">
+				qq_avatar = VALUES(qq_avatar),
+			</if>
+			<if test="bean.password!=null">
+				password = VALUES(password),
+			</if>
+			<if test="bean.joinTime!=null">
+				join_time = VALUES(join_time),
+			</if>
+			<if test="bean.lastLoginTime!=null">
+				last_login_time = VALUES(last_login_time),
+			</if>
+			<if test="bean.status!=null">
+				status = VALUES(status),
+			</if>
+			<if test="bean.useSpace!=null">
+				use_space = VALUES(use_space),
+			</if>
+			<if test="bean.totalSpace!=null">
+				total_space = VALUES(total_space),
+			</if>
+		</trim>
 	</insert>
 
 	<!-- 添加 （批量插入）-->
-	<insert id="insertBatch" parameterType="com.easypan.entity.po.UserInfo" useGeneratedKeys="true" keyProperty="userId">
-		 INSERT INTO user_info(
-			 user_name,
-			 phone,
-			 password,
-			 birthday,
-			 sex,
-			 position,
-			 roles,
-			 create_time
-		 )values
-		 <foreach collection="list" item="item" separator=",">
-			 (
-				 #{item.userName},
-				 #{item.phone},
-				 #{item.password},
-				 #{item.birthday},
-				 #{item.sex},
-				 #{item.position},
-				 #{item.roles},
-				 #{item.createTime}
-			 )
-		 </foreach>
+	<insert id="insertBatch" parameterType="com.easypan.entity.po.UserInfo">
+		INSERT INTO user_info(
+		user_id,
+		nick_name,
+		email,
+		qq_open_id,
+		qq_avatar,
+		password,
+		join_time,
+		last_login_time,
+		status,
+		use_space,
+		total_space
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.userId},
+			#{item.nickName},
+			#{item.email},
+			#{item.qqOpenId},
+			#{item.qqAvatar},
+			#{item.password},
+			#{item.joinTime},
+			#{item.lastLoginTime},
+			#{item.status},
+			#{item.useSpace},
+			#{item.totalSpace}
+			)
+		</foreach>
 	</insert>
 
 	<!-- 批量新增修改 （批量插入）-->
 	<insert id="insertOrUpdateBatch" parameterType="com.easypan.entity.po.UserInfo">
-		 INSERT INTO user_info(
-			 user_name,
-			 phone,
-			 password,
-			 birthday,
-			 sex,
-			 position,
-			 roles,
-			 create_time
-		 )values
-		 <foreach collection="list" item="item" separator=",">
-			 (
-				 #{item.userName},
-				 #{item.phone},
-				 #{item.password},
-				 #{item.birthday},
-				 #{item.sex},
-				 #{item.position},
-				 #{item.roles},
-				 #{item.createTime}
-			 )
-		 </foreach>
-			on DUPLICATE key update 
-			user_name = VALUES(user_name),
-			phone = VALUES(phone),
-			password = VALUES(password),
-			birthday = VALUES(birthday),
-			sex = VALUES(sex),
-			position = VALUES(position),
-			roles = VALUES(roles),
-			create_time = VALUES(create_time)
+		INSERT INTO user_info(
+		user_id,
+		nick_name,
+		email,
+		qq_open_id,
+		qq_avatar,
+		password,
+		join_time,
+		last_login_time,
+		status,
+		use_space,
+		total_space
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.userId},
+			#{item.nickName},
+			#{item.email},
+			#{item.qqOpenId},
+			#{item.qqAvatar},
+			#{item.password},
+			#{item.joinTime},
+			#{item.lastLoginTime},
+			#{item.status},
+			#{item.useSpace},
+			#{item.totalSpace}
+			)
+		</foreach>
+		on DUPLICATE key update
+		user_id = VALUES(user_id),
+		nick_name = VALUES(nick_name),
+		email = VALUES(email),
+		qq_open_id = VALUES(qq_open_id),
+		qq_avatar = VALUES(qq_avatar),
+		password = VALUES(password),
+		join_time = VALUES(join_time),
+		last_login_time = VALUES(last_login_time),
+		status = VALUES(status),
+		use_space = VALUES(use_space),
+		total_space = VALUES(total_space)
 	</insert>
-
-	<!--多条件修改-->
-	<update id="updateByParam" parameterType="com.easypan.entity.query.UserInfoQuery">
-		 UPDATE user_info
- 		 <set> 
-			<if test="bean.userName != null">
-				 user_name = #{bean.userName},
-			</if>
-			<if test="bean.phone != null">
-				 phone = #{bean.phone},
-			</if>
-			<if test="bean.password != null">
-				 password = #{bean.password},
-			</if>
-			<if test="bean.birthday != null">
-				 birthday = #{bean.birthday},
-			</if>
-			<if test="bean.sex != null">
-				 sex = #{bean.sex},
-			</if>
-			<if test="bean.position != null">
-				 position = #{bean.position},
-			</if>
-			<if test="bean.roles != null">
-				 roles = #{bean.roles},
-			</if>
-			<if test="bean.createTime != null">
-				 create_time = #{bean.createTime},
-			</if>
- 		 </set>
- 		 <include refid="query_condition" />
-	</update>
-
-	<!--多条件删除-->
-	<delete id="deleteByParam">
-		 delete from user_info
- 		 <include refid="query_condition" />
-	</delete>
 
 	<!-- 根据UserId修改-->
 	<update id="updateByUserId" parameterType="com.easypan.entity.po.UserInfo">
-		 UPDATE user_info
- 		 <set> 
-			<if test="bean.userName != null">
-				 user_name = #{bean.userName},
+		UPDATE user_info
+		<set>
+			<if test="bean.nickName != null">
+				nick_name = #{bean.nickName},
 			</if>
-			<if test="bean.phone != null">
-				 phone = #{bean.phone},
+			<if test="bean.email != null">
+				email = #{bean.email},
+			</if>
+			<if test="bean.qqOpenId != null">
+				qq_open_id = #{bean.qqOpenId},
+			</if>
+			<if test="bean.qqAvatar != null">
+				qq_avatar = #{bean.qqAvatar},
 			</if>
 			<if test="bean.password != null">
-				 password = #{bean.password},
+				password = #{bean.password},
 			</if>
-			<if test="bean.birthday != null">
-				 birthday = #{bean.birthday},
+			<if test="bean.joinTime != null">
+				join_time = #{bean.joinTime},
 			</if>
-			<if test="bean.sex != null">
-				 sex = #{bean.sex},
+			<if test="bean.lastLoginTime != null">
+				last_login_time = #{bean.lastLoginTime},
 			</if>
-			<if test="bean.position != null">
-				 position = #{bean.position},
+			<if test="bean.status != null">
+				status = #{bean.status},
 			</if>
-			<if test="bean.roles != null">
-				 roles = #{bean.roles},
+			<if test="bean.useSpace != null">
+				use_space = #{bean.useSpace},
 			</if>
-			<if test="bean.createTime != null">
-				 create_time = #{bean.createTime},
+			<if test="bean.totalSpace != null">
+				total_space = #{bean.totalSpace},
 			</if>
- 		 </set>
- 		 where user_id=#{userId}
+		</set>
+		where user_id=#{userId}
 	</update>
 
 	<!-- 根据UserId删除-->
 	<delete id="deleteByUserId">
-		delete from user_info where user_id=#{userId}
+		delete
+		from user_info
+		where user_id = #{userId}
 	</delete>
 
 	<!-- 根据PrimaryKey获取对象-->
-	<select id="selectByUserId" resultMap="base_result_map" >
-		select <include refid="base_column_list" /> from user_info where user_id=#{userId}
+	<select id="selectByUserId" resultMap="base_result_map">
+		select
+		<include refid="base_column_list"/>
+		from user_info where user_id=#{userId}
 	</select>
+
+	<!-- 根据Email修改-->
+	<update id="updateByEmail" parameterType="com.easypan.entity.po.UserInfo">
+		UPDATE user_info
+		<set>
+			<if test="bean.userId != null">
+				user_id = #{bean.userId},
+			</if>
+			<if test="bean.nickName != null">
+				nick_name = #{bean.nickName},
+			</if>
+			<if test="bean.qqOpenId != null">
+				qq_open_id = #{bean.qqOpenId},
+			</if>
+			<if test="bean.qqAvatar != null">
+				qq_avatar = #{bean.qqAvatar},
+			</if>
+			<if test="bean.password != null">
+				password = #{bean.password},
+			</if>
+			<if test="bean.joinTime != null">
+				join_time = #{bean.joinTime},
+			</if>
+			<if test="bean.lastLoginTime != null">
+				last_login_time = #{bean.lastLoginTime},
+			</if>
+			<if test="bean.status != null">
+				status = #{bean.status},
+			</if>
+			<if test="bean.useSpace != null">
+				use_space = #{bean.useSpace},
+			</if>
+			<if test="bean.totalSpace != null">
+				total_space = #{bean.totalSpace},
+			</if>
+		</set>
+		where email=#{email}
+	</update>
+
+	<!-- 根据Email删除-->
+	<delete id="deleteByEmail">
+		delete
+		from user_info
+		where email = #{email}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByEmail" resultMap="base_result_map">
+		select
+		<include refid="base_column_list"/>
+		from user_info where email=#{email}
+	</select>
+
 
 </mapper>

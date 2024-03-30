@@ -18,7 +18,7 @@ public class CreateImageCode {
     // 验证码字符个数
     private int codeCount = 4;
     // 验证码干扰线数
-    private int lineCount = 20;
+    private int lineCount = 5;
     // 验证码
     private String code = null;
     // 验证码图片Buffer
@@ -73,7 +73,7 @@ public class CreateImageCode {
             g.drawLine(xs,ys,xe,ye);
         }
         //添加噪点
-        float yawpRate = 0.01f;
+        float yawpRate = 0.001f;
         int area = (int) (yawpRate + width * height);
         for (int i = 0;i < area;i++){
             int x = random.nextInt(width);
