@@ -1,6 +1,9 @@
 package com.easypan.service.impl;
 
+import com.easypan.componet.RedisComponet;
+import com.easypan.entity.config.AppConfig;
 import com.easypan.entity.constants.Constants;
+import com.easypan.entity.dto.SysSettingsDto;
 import com.easypan.entity.enums.PageSize;
 import com.easypan.entity.po.EmailCode;
 import com.easypan.entity.po.UserInfo;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Date;
 import java.util.List;
@@ -40,14 +44,14 @@ public class EmailCodeServiceImpl implements EmailCodeService {
     @Resource
     private JavaMailSender javaMailSender;
 
-//    @Resource
-//    private AppConfig appConfig;
+    @Resource
+    private AppConfig appConfig;
 
     @Resource
     private UserInfoMapper<UserInfo, UserInfoQuery> userInfoMapper;
 
-//    @Resource
-//    private RedisComponent redisComponent;
+    @Resource
+    private RedisComponet redisComponent;
 
     /**
      * 根据条件查询列表
@@ -161,10 +165,10 @@ public class EmailCodeServiceImpl implements EmailCodeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void sendEmailCode(String toEmail, Integer type) {
+    public void sendEmailCode(String email, Integer type) {
         //如果是注册，校验邮箱是否已存在
         if (type.equals(Constants.ZERO)) {
-            UserInfo userInfo = userInfoMapper.selectByEmail(toEmail);
+            UserInfo userInfo = userInfoMapper.selectByEmail(email);
             if (null != userInfo) {
                 throw new BusinessException("邮箱已经存在");
             }
@@ -172,15 +176,37 @@ public class EmailCodeServiceImpl implements EmailCodeService {
 
         String code = StringTools.getRandomNumber(Constants.LENGTH_5);
         //TODO 发送验证码
-//        sendEmailCode(toEmail, code);
+        sendEmailCode(email, code);
         //将之前的验证码值无效
-        emailCodeMapper.disableEmailCode(toEmail);
+        emailCodeMapper.disableEmailCode(email);
         EmailCode emailCode = new EmailCode();
         emailCode.setCode(code);
-        emailCode.setEmail(toEmail);
+        emailCode.setEmail(email);
         emailCode.setStatus(Constants.ZERO);
         emailCode.setCreateTime(new Date());
         emailCodeMapper.insert(emailCode);
+    }
+
+    private void sendEmailCode(String toEmail,String code) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message,true);
+            //邮件发件人
+            helper.setFrom(appConfig.getSendUserName());
+            //邮件收件人一个或多个
+            helper.setTo(toEmail);
+            SysSettingsDto sysSettingsDto = redisComponent.getSysSettingDto();
+            //邮件标题
+            helper.setSubject(sysSettingsDto.getRegisterMailTitle());
+            //邮件内容
+            helper.setText(sysSettingsDto.getRegisterMailContent(),code);
+            //邮件发送时间
+            helper.setSentDate(new Date());
+            javaMailSender.send(message);
+        } catch (Exception e) {
+            logger.error("邮件发送失败",e);
+            throw new BusinessException("邮件发送失败");
+        }
     }
 
     @Override
