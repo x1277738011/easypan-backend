@@ -2,6 +2,7 @@ package com.easypan.controller;
 
 import java.io.IOException;
 
+import com.easypan.annotation.GlobalInterceptor;
 import com.easypan.entity.constants.Constants;
 import com.easypan.entity.dto.CreateImageCode;
 import com.easypan.entity.vo.ResponseVO;
@@ -42,6 +43,7 @@ public class AccountController extends ABaseController{
 		vCode.write(response.getOutputStream());
 	}
 	@RequestMapping("/sendEmailCode")
+	@GlobalInterceptor
 	public ResponseVO sendEmailCode(HttpSession session,String email,String checkCode,Integer type){
 		try {
 			if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY_EMIL))) {

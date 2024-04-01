@@ -199,7 +199,7 @@ public class EmailCodeServiceImpl implements EmailCodeService {
             //邮件标题
             helper.setSubject(sysSettingsDto.getRegisterMailTitle());
             //邮件内容
-            helper.setText(sysSettingsDto.getRegisterMailContent(),code);
+            helper.setText(String.format(sysSettingsDto.getRegisterMailContent(),code));
             //邮件发送时间
             helper.setSentDate(new Date());
             javaMailSender.send(message);
