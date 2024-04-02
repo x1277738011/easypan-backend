@@ -7,6 +7,12 @@ import org.springframework.stereotype.Component;
 public class AppConfig {
     @Value("${spring.mail.username}")
     private String sendUserName;
+    @Value("${admin.emails}")
+    private String adminEmails;
+
+    public String getAdminEmails() {
+        return adminEmails;
+    }
 
     public String getSendUserName() {
         return sendUserName;

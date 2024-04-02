@@ -8,25 +8,40 @@ import java.util.Date;
  */
 public class UserInfoQuery extends BaseParam {
 
-
 	/**
 	 * 用户ID
 	 */
-	private Integer userId;
+	private String userId;
+
+	private String userIdFuzzy;
 
 	/**
-	 * 用户名
+	 * 昵称
 	 */
-	private String userName;
+	private String nickName;
 
-	private String userNameFuzzy;
+	private String nickNameFuzzy;
 
 	/**
-	 * 
+	 * 邮箱
 	 */
-	private String phone;
+	private String email;
 
-	private String phoneFuzzy;
+	private String emailFuzzy;
+
+	/**
+	 *
+	 */
+	private String qqAvatar;
+
+	private String qqAvatarFuzzy;
+
+	/**
+	 *
+	 */
+	private String qqOpenId;
+
+	private String qqOpenIdFuzzy;
 
 	/**
 	 * 密码
@@ -36,79 +51,117 @@ public class UserInfoQuery extends BaseParam {
 	private String passwordFuzzy;
 
 	/**
-	 * 出生年月
+	 * 加入时间
 	 */
-	private String birthday;
+	private String joinTime;
 
-	private String birthdayStart;
+	private String joinTimeStart;
 
-	private String birthdayEnd;
+	private String joinTimeEnd;
 
 	/**
-	 * 性别 0:女 1:男
+	 * 最后登录时间
 	 */
-	private Integer sex;
+	private String lastLoginTime;
+
+	private String lastLoginTimeStart;
+
+	private String lastLoginTimeEnd;
 
 	/**
-	 * 职位0:程序员 1:测试  2:产品经理
+	 * 0:禁用 1:正常
 	 */
-	private Integer position;
+	private Integer status;
 
 	/**
-	 * 角色 0:普通用户 1:组长 2:经理 3:管理员 可多选
+	 *
 	 */
-	private String roles;
-
-	private String rolesFuzzy;
+	private Long useSpace;
 
 	/**
-	 * 创建时间
+	 *
 	 */
-	private String createTime;
-
-	private String createTimeStart;
-
-	private String createTimeEnd;
+	private Long totalSpace;
 
 
-	public void setUserId(Integer userId){
+	public void setUserId(String userId){
 		this.userId = userId;
 	}
 
-	public Integer getUserId(){
+	public String getUserId(){
 		return this.userId;
 	}
 
-	public void setUserName(String userName){
-		this.userName = userName;
+	public void setUserIdFuzzy(String userIdFuzzy){
+		this.userIdFuzzy = userIdFuzzy;
 	}
 
-	public String getUserName(){
-		return this.userName;
+	public String getUserIdFuzzy(){
+		return this.userIdFuzzy;
 	}
 
-	public void setUserNameFuzzy(String userNameFuzzy){
-		this.userNameFuzzy = userNameFuzzy;
+	public void setNickName(String nickName){
+		this.nickName = nickName;
 	}
 
-	public String getUserNameFuzzy(){
-		return this.userNameFuzzy;
+	public String getNickName(){
+		return this.nickName;
 	}
 
-	public void setPhone(String phone){
-		this.phone = phone;
+	public void setNickNameFuzzy(String nickNameFuzzy){
+		this.nickNameFuzzy = nickNameFuzzy;
 	}
 
-	public String getPhone(){
-		return this.phone;
+	public String getNickNameFuzzy(){
+		return this.nickNameFuzzy;
 	}
 
-	public void setPhoneFuzzy(String phoneFuzzy){
-		this.phoneFuzzy = phoneFuzzy;
+	public void setEmail(String email){
+		this.email = email;
 	}
 
-	public String getPhoneFuzzy(){
-		return this.phoneFuzzy;
+	public String getEmail(){
+		return this.email;
+	}
+
+	public void setEmailFuzzy(String emailFuzzy){
+		this.emailFuzzy = emailFuzzy;
+	}
+
+	public String getEmailFuzzy(){
+		return this.emailFuzzy;
+	}
+
+	public void setQqAvatar(String qqAvatar){
+		this.qqAvatar = qqAvatar;
+	}
+
+	public String getQqAvatar(){
+		return this.qqAvatar;
+	}
+
+	public void setQqAvatarFuzzy(String qqAvatarFuzzy){
+		this.qqAvatarFuzzy = qqAvatarFuzzy;
+	}
+
+	public String getQqAvatarFuzzy(){
+		return this.qqAvatarFuzzy;
+	}
+
+	public void setQqOpenId(String qqOpenId){
+		this.qqOpenId = qqOpenId;
+	}
+
+	public String getQqOpenId(){
+		return this.qqOpenId;
+	}
+
+	public void setQqOpenIdFuzzy(String qqOpenIdFuzzy){
+		this.qqOpenIdFuzzy = qqOpenIdFuzzy;
+	}
+
+	public String getQqOpenIdFuzzy(){
+		return this.qqOpenIdFuzzy;
 	}
 
 	public void setPassword(String password){
@@ -127,82 +180,74 @@ public class UserInfoQuery extends BaseParam {
 		return this.passwordFuzzy;
 	}
 
-	public void setBirthday(String birthday){
-		this.birthday = birthday;
+	public void setJoinTime(String joinTime){
+		this.joinTime = joinTime;
 	}
 
-	public String getBirthday(){
-		return this.birthday;
+	public String getJoinTime(){
+		return this.joinTime;
 	}
 
-	public void setBirthdayStart(String birthdayStart){
-		this.birthdayStart = birthdayStart;
+	public void setJoinTimeStart(String joinTimeStart){
+		this.joinTimeStart = joinTimeStart;
 	}
 
-	public String getBirthdayStart(){
-		return this.birthdayStart;
+	public String getJoinTimeStart(){
+		return this.joinTimeStart;
 	}
-	public void setBirthdayEnd(String birthdayEnd){
-		this.birthdayEnd = birthdayEnd;
-	}
-
-	public String getBirthdayEnd(){
-		return this.birthdayEnd;
+	public void setJoinTimeEnd(String joinTimeEnd){
+		this.joinTimeEnd = joinTimeEnd;
 	}
 
-	public void setSex(Integer sex){
-		this.sex = sex;
+	public String getJoinTimeEnd(){
+		return this.joinTimeEnd;
 	}
 
-	public Integer getSex(){
-		return this.sex;
+	public void setLastLoginTime(String lastLoginTime){
+		this.lastLoginTime = lastLoginTime;
 	}
 
-	public void setPosition(Integer position){
-		this.position = position;
+	public String getLastLoginTime(){
+		return this.lastLoginTime;
 	}
 
-	public Integer getPosition(){
-		return this.position;
+	public void setLastLoginTimeStart(String lastLoginTimeStart){
+		this.lastLoginTimeStart = lastLoginTimeStart;
 	}
 
-	public void setRoles(String roles){
-		this.roles = roles;
+	public String getLastLoginTimeStart(){
+		return this.lastLoginTimeStart;
+	}
+	public void setLastLoginTimeEnd(String lastLoginTimeEnd){
+		this.lastLoginTimeEnd = lastLoginTimeEnd;
 	}
 
-	public String getRoles(){
-		return this.roles;
+	public String getLastLoginTimeEnd(){
+		return this.lastLoginTimeEnd;
 	}
 
-	public void setRolesFuzzy(String rolesFuzzy){
-		this.rolesFuzzy = rolesFuzzy;
+	public void setStatus(Integer status){
+		this.status = status;
 	}
 
-	public String getRolesFuzzy(){
-		return this.rolesFuzzy;
+	public Integer getStatus(){
+		return this.status;
 	}
 
-	public void setCreateTime(String createTime){
-		this.createTime = createTime;
+	public void setUseSpace(Long useSpace){
+		this.useSpace = useSpace;
 	}
 
-	public String getCreateTime(){
-		return this.createTime;
+	public Long getUseSpace(){
+		return this.useSpace;
 	}
 
-	public void setCreateTimeStart(String createTimeStart){
-		this.createTimeStart = createTimeStart;
+	public void setTotalSpace(Long totalSpace){
+		this.totalSpace = totalSpace;
 	}
 
-	public String getCreateTimeStart(){
-		return this.createTimeStart;
-	}
-	public void setCreateTimeEnd(String createTimeEnd){
-		this.createTimeEnd = createTimeEnd;
-	}
-
-	public String getCreateTimeEnd(){
-		return this.createTimeEnd;
+	public Long getTotalSpace(){
+		return this.totalSpace;
 	}
 
 }
