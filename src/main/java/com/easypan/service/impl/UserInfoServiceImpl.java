@@ -273,6 +273,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 		//用户空间
 		UserSpaceDto userSpaceDto = new UserSpaceDto();
 		//userSpaceDto.setUseSpace();
+		//TODO 查询当前用户已上传文件大小总和
 		userSpaceDto.setTotalSpace(userSpaceDto.getTotalSpace());
 		redisComponet.saveSysSettingDto(userInfo.getUserId(),userSpaceDto);
 		return null;

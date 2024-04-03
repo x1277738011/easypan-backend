@@ -23,4 +23,16 @@ public class RedisComponet {
     public void saveSysSettingDto(String userId, UserSpaceDto userSpaceDto){
         redisUtils.setex(Constants.REDIS_KEY_USER_SPACE_USE+userId,userSpaceDto,Constants.REDIS_KEY_EXPIRES_DAY);
     }
+    public UserSpaceDto getUserSpaceUse(String userId) {
+        UserSpaceDto spaceDto = (UserSpaceDto) redisUtils.get(Constants.REDIS_KEY_USER_SPACE_USE + userId);
+        if (null == spaceDto) {
+            spaceDto = new UserSpaceDto();
+            //Long useSpace = this.fileInfoMapper.selectUseSpace(userId);
+            //TODO 查询当前用户已上传文件大小总和
+            spaceDto.setUseSpace(0L);
+            spaceDto.setTotalSpace(getSysSettingDto().getUserIninUseSpace() * Constants.MB);
+            redisUtils.setex(Constants.REDIS_KEY_USER_SPACE_USE + userId, spaceDto, Constants.REDIS_KEY_EXPIRES_DAY);
+        }
+        return spaceDto;
+    }
 }
