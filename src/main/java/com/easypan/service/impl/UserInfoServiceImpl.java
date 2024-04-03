@@ -231,6 +231,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 		//校验邮箱验证码
 		emailCodeService.checkCode(email,emailCode);
 		String usetId = StringTools.getRandomNumber(Constants.LENGTH_5*2);
+		userInfo = new UserInfo();
 		userInfo.setUserId(usetId);
 		userInfo.setEmail(email);
 		userInfo.setNickName(nickName);
@@ -275,5 +276,18 @@ public class UserInfoServiceImpl implements UserInfoService {
 		userSpaceDto.setTotalSpace(userSpaceDto.getTotalSpace());
 		redisComponet.saveSysSettingDto(userInfo.getUserId(),userSpaceDto);
 		return null;
+	}
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void resetPwd(String email, String password, String emailCode) {
+		UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
+		if (userInfo == null){
+			throw new BusinessException("邮箱账号不存在");
+		}
+		//校验邮箱验证码
+		emailCodeService.checkCode(email,emailCode);
+		userInfo = new UserInfo();
+		userInfo.setPassword(StringTools.encodeByMd5(password));
+		this.userInfoMapper.insert(userInfo);
 	}
 }

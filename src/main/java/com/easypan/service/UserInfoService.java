@@ -6,6 +6,7 @@ import com.easypan.entity.dto.SessionWebUserDto;
 import com.easypan.entity.query.UserInfoQuery;
 import com.easypan.entity.po.UserInfo;
 import com.easypan.entity.vo.PaginationResultVO;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -119,4 +120,5 @@ public interface UserInfoService {
 	SessionWebUserDto login(String email,String password);
 
 
+	void resetPwd(String email,  String password, String emailCode);
 }
