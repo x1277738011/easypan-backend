@@ -75,7 +75,7 @@ public class AccountController extends ABaseController {
 	 * @return
 	 */
 	@RequestMapping("/sendEmailCode")
-	@GlobalInterceptor
+	@GlobalInterceptor(checkParams = true,checkLogin = false)
 	public ResponseVO sendEmailCode(HttpSession session,
 									@VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL, max = 150) String email,
 									@VerifyParam(required = true) String checkCode,
@@ -98,7 +98,7 @@ public class AccountController extends ABaseController {
 	 * @return
 	 */
 	@RequestMapping("/register")
-	@GlobalInterceptor
+	@GlobalInterceptor(checkParams = true,checkLogin = false)
 	public ResponseVO register(HttpSession session,
 							   @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL, max = 150) String email,
 							   @VerifyParam(required = true) String nickName,
@@ -123,7 +123,7 @@ public class AccountController extends ABaseController {
 	 * @return
 	 */
 	@RequestMapping("/login")
-	@GlobalInterceptor
+	@GlobalInterceptor(checkParams = true,checkLogin = false)
 	public ResponseVO login(HttpSession session,
 							@VerifyParam(required = true) String email,
 							@VerifyParam(required = true) String password,
@@ -148,7 +148,7 @@ public class AccountController extends ABaseController {
 	 * @return
 	 */
 	@RequestMapping("/resetPwd")
-	@GlobalInterceptor
+	@GlobalInterceptor(checkParams = true,checkLogin = false)
 	public ResponseVO resetPwd(HttpSession session,
 							   @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL, max = 150) String email,
 							   @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD, min = 8, max = 10) String password,
@@ -172,7 +172,7 @@ public class AccountController extends ABaseController {
 	 * @return
 	 */
 	@RequestMapping("/getAvatar/{userId}")
-	@GlobalInterceptor
+	@GlobalInterceptor(checkParams = true,checkLogin = false)
 	public void getAvatar(HttpServletResponse response, HttpSession session,
 						  @VerifyParam(required = true) @PathVariable("userId") String userId
 	) {
@@ -216,11 +216,11 @@ public class AccountController extends ABaseController {
 		return getSuccessResponseVO(sessionWebUserDto);
 	}
 	@RequestMapping("/getUseSpace")
-	@GlobalInterceptor(checkParams = true)
+	@GlobalInterceptor
 	public ResponseVO getUseSpace(HttpSession session) {
 		SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
 		UserSpaceDto spaceDto = redisComponet.getUserSpaceUse(sessionWebUserDto.getUserId());
-		return getSuccessResponseVO(redisComponet.getUserSpaceUse(sessionWebUserDto.getUserId()));
+		return getSuccessResponseVO(spaceDto);
 	}
 	@RequestMapping("/logout")
 	public ResponseVO logout(HttpSession session) {

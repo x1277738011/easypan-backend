@@ -276,7 +276,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 		//TODO 查询当前用户已上传文件大小总和
 		userSpaceDto.setTotalSpace(userSpaceDto.getTotalSpace());
 		redisComponet.saveSysSettingDto(userInfo.getUserId(),userSpaceDto);
-		return null;
+		return sessionWebUserDto;
 	}
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -289,6 +289,6 @@ public class UserInfoServiceImpl implements UserInfoService {
 		emailCodeService.checkCode(email,emailCode);
 		userInfo = new UserInfo();
 		userInfo.setPassword(StringTools.encodeByMd5(password));
-		this.userInfoMapper.insert(userInfo);
+		this.userInfoMapper.updateByEmail(userInfo,email);
 	}
 }

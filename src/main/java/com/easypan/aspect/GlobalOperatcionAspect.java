@@ -2,6 +2,8 @@ package com.easypan.aspect;
 
 import com.easypan.annotation.GlobalInterceptor;
 import com.easypan.annotation.VerifyParam;
+import com.easypan.entity.constants.Constants;
+import com.easypan.entity.dto.SessionWebUserDto;
 import com.easypan.entity.enums.ResponseCodeEnum;
 import com.easypan.exception.BusinessException;
 import com.easypan.utils.StringTools;
@@ -18,6 +20,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Field;
@@ -51,12 +54,12 @@ public class GlobalOperatcionAspect {
             if (null == interceptor) {
                 return;
             }
-//            /**
-//             * 校验登录
-//             */
-//            if (interceptor.checkLogin() || interceptor.checkAdmin()) {
-//                checkLogin(interceptor.checkAdmin());
-//            }
+            /**
+             * 校验登录
+             */
+            if (interceptor.checkLogin() || interceptor.checkAdmin()) {
+                checkLogin(interceptor.checkAdmin());
+            }
             /**
              * 校验参数
              */
@@ -73,6 +76,20 @@ public class GlobalOperatcionAspect {
             logger.error("全局拦截器异常", e);
             throw new BusinessException(ResponseCodeEnum.CODE_500);
         }
+    }
+    private void checkLogin(Boolean checkAdmin){
+        //RequestContextHolder.getRequestAttributes()获取拦截对象信息
+        HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpSession session = request.getSession();
+        SessionWebUserDto userDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
+        if (null == userDto) {
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
+
+        if (checkAdmin && !userDto.getAdmin()) {
+            throw new BusinessException(ResponseCodeEnum.CODE_404);
+        }
+
     }
     private void validateParams(Method m, Object[] arguments) throws BusinessException {
         Parameter[] parameters = m.getParameters();
