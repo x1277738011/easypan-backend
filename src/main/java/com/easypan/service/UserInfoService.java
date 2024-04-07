@@ -121,4 +121,6 @@ public interface UserInfoService {
 
 
 	void resetPwd(String email,  String password, String emailCode);
+
+    SessionWebUserDto qqLogin(String code);
 }
