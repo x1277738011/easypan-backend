@@ -5,6 +5,7 @@ import com.easypan.entity.config.AppConfig;
 import com.easypan.entity.constants.Constants;
 import com.easypan.entity.dto.SessionWebUserDto;
 //import com.easypan.entity.dto.UploadResultDto;
+import com.easypan.entity.dto.UploadResultDto;
 import com.easypan.entity.dto.UserSpaceDto;
 import com.easypan.entity.enums.*;
 import com.easypan.entity.po.FileInfo;
@@ -152,6 +153,10 @@ public class FileInfoServiceImpl implements FileInfoService {
         return this.fileInfoMapper.deleteByFileIdAndUserId(fileId, userId);
     }
 
+    @Override
+    public UploadResultDto uploadFile(SessionWebUserDto webUserDto, String fileId, MultipartFile file, String fileName, String filePid, String fileMd5, Integer chunkIndex, Integer chunks) {
+        return null;
+    }
 
 
 //    @Override

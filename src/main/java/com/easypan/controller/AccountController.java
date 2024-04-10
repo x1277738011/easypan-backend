@@ -213,12 +213,6 @@ public class AccountController extends ABaseController {
 			writer.close();
 		}
 	}
-	@RequestMapping("/getUserInfo")
-	@GlobalInterceptor(checkParams = true)
-	public ResponseVO getUserInfo(HttpSession session) {
-		SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
-		return getSuccessResponseVO(sessionWebUserDto);
-	}
 	@RequestMapping("/getUseSpace")
 	@GlobalInterceptor
 	public ResponseVO getUseSpace(HttpSession session) {
