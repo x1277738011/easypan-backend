@@ -79,5 +79,5 @@ public interface UserInfoMapper<T,P> extends BaseMapper<T,P> {
 	T selectByQqOpenId(@Param("qqOpenId") String qqOpenId);
 
 
-	//Integer updateUserSpace(@Param("userId") String userId, @Param("useSpace") Long useSpace, @Param("totalSpace") Long totalSpace);
+	Integer updateUserSpace(@Param("userId") String userId, @Param("useSpace") Long useSpace, @Param("totalSpace") Long totalSpace);
 }

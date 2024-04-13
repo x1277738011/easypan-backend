@@ -175,7 +175,6 @@ public class EmailCodeServiceImpl implements EmailCodeService {
         }
 
         String code = StringTools.getRandomNumber(Constants.LENGTH_5);
-        //TODO 发送验证码
         sendEmailCode(email, code);
         //将之前的验证码值无效
         emailCodeMapper.disableEmailCode(email);

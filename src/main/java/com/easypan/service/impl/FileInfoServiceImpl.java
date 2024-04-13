@@ -22,6 +22,7 @@ import com.easypan.utils.DateUtil;
 //import com.easypan.utils.ProcessUtils;
 //import com.easypan.utils.ScaleFilter;
 import com.easypan.utils.StringTools;
+import org.apache.catalina.User;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,10 +155,90 @@ public class FileInfoServiceImpl implements FileInfoService {
     }
 
     @Override
-    public UploadResultDto uploadFile(SessionWebUserDto webUserDto, String fileId, MultipartFile file, String fileName, String filePid, String fileMd5, Integer chunkIndex, Integer chunks) {
-        return null;
+    public UploadResultDto uploadFile(SessionWebUserDto webUserDto,
+                                      String fileId,
+                                      MultipartFile file,
+                                      String fileName,
+                                      String filePid,
+                                      String fileMd5,
+                                      Integer chunkIndex,
+                                      Integer chunks) {
+        UploadResultDto resultDto = new UploadResultDto();
+        if (StringTools.isEmpty(fileId)) {
+            fileId = StringTools.getRandomNumber(Constants.LENGTH_10);
+        }
+        resultDto.setFileId(fileId);
+        Date curDate = new Date();
+        UserSpaceDto spaceDto = redisComponent.getUserSpaceUse(webUserDto.getUserId());
+        if (chunkIndex == 0) {
+            FileInfoQuery infoQuery = new FileInfoQuery();
+            infoQuery.setFileMd5(fileMd5);
+            infoQuery.setSimplePage(new SimplePage(0, 1));
+            infoQuery.setStatus(FileStatusEnums.USING.getStatus());
+            List<FileInfo> dbFileList = this.fileInfoMapper.selectList(infoQuery);
+            //秒传
+            if (!dbFileList.isEmpty()) {
+                FileInfo dbFile = dbFileList.get(0);
+                //判断文件状态
+                if (dbFile.getFileSize() + spaceDto.getUseSpace() > spaceDto.getTotalSpace()) {
+                    throw new BusinessException(ResponseCodeEnum.CODE_904);
+                }
+                dbFile.setFileId(fileId);
+                dbFile.setFilePid(filePid);
+                dbFile.setUserId(webUserDto.getUserId());
+                dbFile.setFileMd5(null);
+                dbFile.setCreateTime(curDate);
+                dbFile.setLastUpdateTime(curDate);
+                dbFile.setStatus(FileStatusEnums.USING.getStatus());
+                dbFile.setDelFlag(FileDelFlagEnums.USING.getFlag());
+                dbFile.setFileMd5(fileMd5);
+                fileName = null;
+                dbFile.setFileName(fileName);
+                this.fileInfoMapper.insert(dbFile);
+                resultDto.setStatus(UploadStatusEnums.UPLOAD_SECONDS.getCode());
+                //更新用户空间使用
+                updateUserSpace(webUserDto, dbFile.getFileSize());
+                return resultDto;
+            }
+        }
+        return resultDto;
+        }
+
+    /**
+     * 自动命令文件
+     * @param filePid
+     * @param userId
+     * @param fileName
+     * @return
+     */
+    private String autoRename(String filePid, String userId, String fileName) {
+        FileInfoQuery fileInfoQuery = new FileInfoQuery();
+        fileInfoQuery.setUserId(userId);
+        fileInfoQuery.setFilePid(filePid);
+        fileInfoQuery.setDelFlag(FileDelFlagEnums.USING.getFlag());
+        fileInfoQuery.setFileName(fileName);
+        Integer count = this.fileInfoMapper.selectCount(fileInfoQuery);
+        if (count > 0) {
+            return StringTools.rename(fileName);
+        }
+
+        return fileName;
     }
 
+    /**
+     * 更新文件大小
+     * @param webUserDto
+     * @param totalSize
+     */
+    private void updateUserSpace(SessionWebUserDto webUserDto, Long totalSize) {
+        Integer count = userInfoMapper.updateUserSpace(webUserDto.getUserId(), totalSize, null);
+        if (count == 0) {
+            throw new BusinessException(ResponseCodeEnum.CODE_904);
+        }
+        UserSpaceDto spaceDto = redisComponent.getUserSpaceUse(webUserDto.getUserId());
+        spaceDto.setUseSpace(spaceDto.getUseSpace() + totalSize);
+        redisComponent.saveSysSettingDto(webUserDto.getUserId(), spaceDto);
+    }
 
 //    @Override
 //    @Transactional(rollbackFor = Exception.class)
@@ -782,4 +863,6 @@ public class FileInfoServiceImpl implements FileInfoService {
 //    public void deleteFileByUserId(String userId) {
 //        this.fileInfoMapper.deleteFileByUserId(userId);
 //    }
+
+
 }
