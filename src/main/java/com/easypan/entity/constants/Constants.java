@@ -12,6 +12,7 @@ public class Constants {
     public static final String FILE_FOLDER_FILE = "/file/";
     public static final String FILE_FOLDER_AVATAR_NAME = "avatar/";
     public static final String AVATAR_SUFFIX = ".jpg";
+    public static final String FILE_FOLDER_TEMP = "/temp/";
     public static final String AVATAR_DEFUALT = "defualt_avatar.jpg";
     public static final Long MB=1024*1024L;
     public static final String REDIS_KEY_USER_SPACE_USE= "easypan:user:spaceuse:";
@@ -19,4 +20,7 @@ public class Constants {
     public static final Integer REDIS_KEY_EXPIRES_DAY = REDIS_KEY_EXPIRES_ONE_MIN*60*24;
     public static final String VIEW_OBJ_RESULT_KEY = "result";
     public static final Integer LENGTH_150 = 150;
+
+    public static final String REDIS_KEY_USER_FILE_TEMP_SIZE = "easypan:user:file:temp";
+    public static final Integer REDIS_KEY_EXPIRES_ONE_HOUR = REDIS_KEY_EXPIRES_ONE_MIN*60;
 }

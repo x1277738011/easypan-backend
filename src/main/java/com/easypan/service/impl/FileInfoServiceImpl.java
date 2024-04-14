@@ -186,13 +186,13 @@ public class FileInfoServiceImpl implements FileInfoService {
                 dbFile.setFileId(fileId);
                 dbFile.setFilePid(filePid);
                 dbFile.setUserId(webUserDto.getUserId());
-                dbFile.setFileMd5(null);
                 dbFile.setCreateTime(curDate);
                 dbFile.setLastUpdateTime(curDate);
                 dbFile.setStatus(FileStatusEnums.USING.getStatus());
                 dbFile.setDelFlag(FileDelFlagEnums.USING.getFlag());
                 dbFile.setFileMd5(fileMd5);
-                fileName = null;
+                //文件重命名
+                fileName = autoRename(filePid,webUserDto.getUserId(),fileName);
                 dbFile.setFileName(fileName);
                 this.fileInfoMapper.insert(dbFile);
                 resultDto.setStatus(UploadStatusEnums.UPLOAD_SECONDS.getCode());
@@ -200,6 +200,24 @@ public class FileInfoServiceImpl implements FileInfoService {
                 updateUserSpace(webUserDto, dbFile.getFileSize());
                 return resultDto;
             }
+            //判断磁盘空间
+            //先放入redis中作为临时存储
+            Long currentTempSize = redisComponent.getFileTempSize(webUserDto.getUserId(), fileId);
+            if (file.getSize() + currentTempSize + spaceDto.getUseSpace() > spaceDto.getTotalSpace()) {
+                throw new BusinessException(ResponseCodeEnum.CODE_904);
+            }
+
+//            File newFile = new File(tempFileFolder.getPath() + "/" + chunkIndex);
+//            file.transferTo(newFile);
+            //暂存在临时目录
+            String tempFolderName = appConfig.getProjectFolder() + Constants.FILE_FOLDER_TEMP;
+            String currentUserFolderName = webUserDto.getUserId() + fileId;
+            //创建临时目录
+            File tempFileFolder = new File(tempFolderName + currentUserFolderName);
+            if (!tempFileFolder.exists()) {
+                tempFileFolder.mkdirs();
+            }
+
         }
         return resultDto;
         }
