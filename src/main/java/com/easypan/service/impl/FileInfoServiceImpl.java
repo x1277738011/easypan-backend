@@ -164,61 +164,76 @@ public class FileInfoServiceImpl implements FileInfoService {
                                       Integer chunkIndex,
                                       Integer chunks) {
         UploadResultDto resultDto = new UploadResultDto();
-        if (StringTools.isEmpty(fileId)) {
-            fileId = StringTools.getRandomNumber(Constants.LENGTH_10);
-        }
-        resultDto.setFileId(fileId);
-        Date curDate = new Date();
-        UserSpaceDto spaceDto = redisComponent.getUserSpaceUse(webUserDto.getUserId());
-        if (chunkIndex == 0) {
-            FileInfoQuery infoQuery = new FileInfoQuery();
-            infoQuery.setFileMd5(fileMd5);
-            infoQuery.setSimplePage(new SimplePage(0, 1));
-            infoQuery.setStatus(FileStatusEnums.USING.getStatus());
-            List<FileInfo> dbFileList = this.fileInfoMapper.selectList(infoQuery);
-            //秒传
-            if (!dbFileList.isEmpty()) {
-                FileInfo dbFile = dbFileList.get(0);
-                //判断文件状态
-                if (dbFile.getFileSize() + spaceDto.getUseSpace() > spaceDto.getTotalSpace()) {
+        try {
+            if (StringTools.isEmpty(fileId)) {
+                fileId = StringTools.getRandomNumber(Constants.LENGTH_10);
+            }
+            resultDto.setFileId(fileId);
+            Date curDate = new Date();
+            // 获取用户可用空间
+            UserSpaceDto spaceDto = redisComponent.getUserSpaceUse(webUserDto.getUserId());
+            // 第一个文件，判断是否可秒传
+            if (chunkIndex == 0) {
+                // 封装查询条件
+                FileInfoQuery infoQuery = new FileInfoQuery();
+                // 文件MD5值
+                infoQuery.setFileMd5(fileMd5);
+                // 只取第一条
+                infoQuery.setSimplePage(new SimplePage(0, 1));
+                // 转码成功，使用中
+                infoQuery.setStatus(FileStatusEnums.USING.getStatus());
+                List<FileInfo> dbFileList = this.fileInfoMapper.selectList(infoQuery);
+                //秒传
+                if (!dbFileList.isEmpty()) {
+                    FileInfo dbFile = dbFileList.get(0);
+                    //判断文件状态,如果空间不足
+                    if (dbFile.getFileSize() + spaceDto.getUseSpace() > spaceDto.getTotalSpace()) {
+                        throw new BusinessException(ResponseCodeEnum.CODE_904);
+                    }
+                    dbFile.setFileId(fileId);
+                    dbFile.setFilePid(filePid);
+                    dbFile.setUserId(webUserDto.getUserId());
+                    dbFile.setCreateTime(curDate);
+                    dbFile.setLastUpdateTime(curDate);
+                    dbFile.setStatus(FileStatusEnums.USING.getStatus());
+                    dbFile.setDelFlag(FileDelFlagEnums.USING.getFlag());
+                    dbFile.setFileMd5(fileMd5);
+                    //文件重命名
+                    fileName = autoRename(filePid, webUserDto.getUserId(), fileName);
+                    dbFile.setFileName(fileName);
+                    this.fileInfoMapper.insert(dbFile);
+                    resultDto.setStatus(UploadStatusEnums.UPLOAD_SECONDS.getCode());
+                    //更新用户空间使用
+                    updateUserSpace(webUserDto, dbFile.getFileSize());
+                    return resultDto;
+                }
+            }
+                //先放入redis中作为临时存储
+                Long currentTempSize = redisComponent.getFileTempSize(webUserDto.getUserId(), fileId);
+                //判断磁盘空间(分片+临时+已使用>总？抛异常:继续）
+                if (file.getSize() + currentTempSize + spaceDto.getUseSpace() > spaceDto.getTotalSpace()) {
                     throw new BusinessException(ResponseCodeEnum.CODE_904);
                 }
-                dbFile.setFileId(fileId);
-                dbFile.setFilePid(filePid);
-                dbFile.setUserId(webUserDto.getUserId());
-                dbFile.setCreateTime(curDate);
-                dbFile.setLastUpdateTime(curDate);
-                dbFile.setStatus(FileStatusEnums.USING.getStatus());
-                dbFile.setDelFlag(FileDelFlagEnums.USING.getFlag());
-                dbFile.setFileMd5(fileMd5);
-                //文件重命名
-                fileName = autoRename(filePid,webUserDto.getUserId(),fileName);
-                dbFile.setFileName(fileName);
-                this.fileInfoMapper.insert(dbFile);
-                resultDto.setStatus(UploadStatusEnums.UPLOAD_SECONDS.getCode());
-                //更新用户空间使用
-                updateUserSpace(webUserDto, dbFile.getFileSize());
-                return resultDto;
-            }
-            //判断磁盘空间
-            //先放入redis中作为临时存储
-            Long currentTempSize = redisComponent.getFileTempSize(webUserDto.getUserId(), fileId);
-            if (file.getSize() + currentTempSize + spaceDto.getUseSpace() > spaceDto.getTotalSpace()) {
-                throw new BusinessException(ResponseCodeEnum.CODE_904);
-            }
 
-//            File newFile = new File(tempFileFolder.getPath() + "/" + chunkIndex);
-//            file.transferTo(newFile);
-            //暂存在临时目录
-            String tempFolderName = appConfig.getProjectFolder() + Constants.FILE_FOLDER_TEMP;
-            String currentUserFolderName = webUserDto.getUserId() + fileId;
-            //创建临时目录
-            File tempFileFolder = new File(tempFolderName + currentUserFolderName);
-            if (!tempFileFolder.exists()) {
-                tempFileFolder.mkdirs();
-            }
-
+                //暂存在临时目录 d:/easypan/temp/
+                String tempFolderName = appConfig.getProjectFolder() + Constants.FILE_FOLDER_TEMP;
+                String currentUserFolderName = webUserDto.getUserId() + fileId;
+                //创建临时目录 d:/easypan/temp/{userId}/{fileId}
+                File tempFileFolder = new File(tempFolderName + currentUserFolderName);
+                if (!tempFileFolder.exists()) {
+                    tempFileFolder.mkdirs();
+                }
+                File newFile = new File(tempFileFolder.getPath() + "/" + chunkIndex);
+                file.transferTo(newFile);
+                if (chunkIndex < chunks - 1){
+                    //保存临时大小
+                    resultDto.setStatus(UploadStatusEnums.UPLOADING.getCode());
+                    return resultDto;
+                }
+        }catch (Exception e){
+            logger.error("文件上传失败:",e);
         }
+
         return resultDto;
         }
 

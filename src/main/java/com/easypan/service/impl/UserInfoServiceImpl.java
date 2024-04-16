@@ -240,7 +240,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 		}
 		//校验邮箱验证码
 		emailCodeService.checkCode(email,emailCode);
-		String usetId = StringTools.getRandomNumber(Constants.LENGTH_5*2);
+		String usetId = StringTools.getRandomString(Constants.LENGTH_5*2);
 		userInfo = new UserInfo();
 		userInfo.setUserId(usetId);
 		userInfo.setEmail(email);
