@@ -230,6 +230,15 @@ public class FileInfoServiceImpl implements FileInfoService {
                     resultDto.setStatus(UploadStatusEnums.UPLOADING.getCode());
                     return resultDto;
                 }
+                //最后一个分片上传完成，记录数据库异步合并封分片
+                String month = DateUtil.format(new Date(),DateTimePatternEnum.YYYY_MM.getPattern());
+                String fileSuffix = StringTools.getFileSuffix(fileName);
+                // 真实文件名
+                // userId + fileId.fileSuffix
+                String realFileName = currentUserFolderName + fileSuffix;
+                // 根据后缀从枚举类中获取文件类别
+                FileTypeEnums fileTypeEnums = FileTypeEnums.getFileTypeBySuffix(fileSuffix);
+
         }catch (Exception e){
             logger.error("文件上传失败:",e);
         }
