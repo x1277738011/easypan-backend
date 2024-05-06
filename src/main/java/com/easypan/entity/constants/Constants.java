@@ -23,4 +23,7 @@ public class Constants {
 
     public static final String REDIS_KEY_USER_FILE_TEMP_SIZE = "easypan:user:file:temp";
     public static final Integer REDIS_KEY_EXPIRES_ONE_HOUR = REDIS_KEY_EXPIRES_ONE_MIN*60;
+    public static final String TS_NAME = "index.ts";
+    public static final String M3U8_NAME = "index.m3u8";
+    public static final String IMAGE_PNG_SUFFIX = ".png";
 }
