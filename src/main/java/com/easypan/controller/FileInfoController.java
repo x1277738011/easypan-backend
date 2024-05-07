@@ -10,7 +10,7 @@ import com.easypan.entity.po.FileInfo;
 import com.easypan.entity.query.FileInfoQuery;
 import com.easypan.entity.vo.PaginationResultVO;
 import com.easypan.entity.vo.ResponseVO;
-
+import com.easypan.controller.CommonFileController;
 import com.easypan.service.FileInfoService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 @RestController("fileInfoController")
 @RequestMapping("fileInfo")
-public class FileInfoController extends ABaseController {
+public class FileInfoController extends CommonFileController {
 
     @Resource
     private FileInfoService fileInfoService;
@@ -62,4 +62,11 @@ public class FileInfoController extends ABaseController {
         UploadResultDto resultDto = fileInfoService.uploadFile(webUserDto,fileId,file,fileName,filePid,fileMd5,chunkIndex,chunks);
         return getSuccessResponseVO(null);
     }
+    @Override
+    @RequestMapping("getImage/{imageFolder}/{imageName}")
+    @GlobalInterceptor(checkParams = true)
+    public void getImage(HttpServletResponse response, @PathVariable("imageFolder") String imageFolder, @PathVariable("imageName") String imageName) {
+        super.getImage(response, imageFolder, imageName);
+    }
+
 }
