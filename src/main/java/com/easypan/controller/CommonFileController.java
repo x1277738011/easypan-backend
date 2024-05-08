@@ -10,10 +10,12 @@ import com.easypan.entity.enums.ResponseCodeEnum;
 import com.easypan.entity.po.FileInfo;
 import com.easypan.entity.query.FileInfoQuery;
 //import com.easypan.entity.vo.FolderVO;
+import com.easypan.entity.vo.FolderVO;
 import com.easypan.entity.vo.ResponseVO;
 import com.easypan.exception.BusinessException;
 import com.easypan.service.FileInfoService;
 //import com.easypan.utils.CopyTools;
+import com.easypan.utils.CopyTools;
 import com.easypan.utils.StringTools;
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,18 +37,23 @@ public class CommonFileController extends ABaseController {
     @Resource
     private RedisComponet redisComponet;
 
-
-//    public ResponseVO getFolderInfo(String path, String userId) {
-//        String[] pathArray = path.split("/");
-//        FileInfoQuery infoQuery = new FileInfoQuery();
-//        infoQuery.setUserId(userId);
-//        infoQuery.setFolderType(FileFolderTypeEnums.FOLDER.getType());
-//        infoQuery.setFileIdArray(pathArray);
-//        String orderBy = "field(file_id,\"" + StringUtils.join(pathArray, "\",\"") + "\")";
-//        infoQuery.setOrderBy(orderBy);
-//        List<FileInfo> fileInfoList = fileInfoService.findListByParam(infoQuery);
-//        return getSuccessResponseVO(CopyTools.copyList(fileInfoList, FolderVO.class));
-//    }
+    /**
+     * 文件路径
+     * @param path
+     * @param userId
+     * @return
+     */
+    public ResponseVO getFolderInfo(String path, String userId) {
+        String[] pathArray = path.split("/");
+        FileInfoQuery infoQuery = new FileInfoQuery();
+        infoQuery.setUserId(userId);
+        infoQuery.setFolderType(FileFolderTypeEnums.FOLDER.getType());
+        infoQuery.setFileIdArray(pathArray);
+        String orderBy = "field(file_id,\"" + StringUtils.join(pathArray, "\",\"") + "\")";
+        infoQuery.setOrderBy(orderBy);
+        List<FileInfo> fileInfoList = fileInfoService.findListByParam(infoQuery);
+        return getSuccessResponseVO(CopyTools.copyList(fileInfoList, FolderVO.class));
+    }
 
     public void getImage(HttpServletResponse response, String imageFolder, String imageName) {
         if (StringTools.isEmpty(imageFolder) || StringUtils.isBlank(imageName)) {
@@ -110,6 +117,7 @@ public class CommonFileController extends ABaseController {
         }
         readFile(response, filePath);
     }
+
 
 //    protected ResponseVO createDownloadUrl(String fileId, String userId) {
 //        FileInfo fileInfo = fileInfoService.getFileInfoByFileIdAndUserId(fileId, userId);

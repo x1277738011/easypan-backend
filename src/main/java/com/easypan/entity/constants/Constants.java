@@ -26,4 +26,5 @@ public class Constants {
     public static final String TS_NAME = "index.ts";
     public static final String M3U8_NAME = "index.m3u8";
     public static final String IMAGE_PNG_SUFFIX = ".png";
+    public static final String ZERO_STR = "0";
 }
