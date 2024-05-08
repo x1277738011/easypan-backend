@@ -27,4 +27,8 @@ public class Constants {
     public static final String M3U8_NAME = "index.m3u8";
     public static final String IMAGE_PNG_SUFFIX = ".png";
     public static final String ZERO_STR = "0";
+    public static final Integer LENGTH_50 = 50;
+    public static final String REDIS_KEY_DOWNLOAD = "easypan:download:";
+
+    public static final Integer REDIS_KEY_EXPIRES_FIVE_MIN = REDIS_KEY_EXPIRES_ONE_MIN*5;
 }

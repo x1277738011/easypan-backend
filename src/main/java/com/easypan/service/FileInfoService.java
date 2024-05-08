@@ -75,6 +75,7 @@ public interface FileInfoService {
     FileInfo newFolder(String filePid, String userId, String folderName);
     FileInfo rename(String fileId, String userId, String fileName);
     void changeFileFolder(String fileIds, String filePid, String userId);
+    void removeFile2RecycleBatch(String userId, String fileIds);
 }
 //    UploadResultDto uploadFile(SessionWebUserDto webUserDto, String fileId, MultipartFile file, String fileName, String filePid, String fileMd5, Integer chunkIndex,
 //                               Integer chunks);

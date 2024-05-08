@@ -4,6 +4,7 @@ import com.easypan.componet.RedisComponet;
 import com.easypan.entity.config.AppConfig;
 import com.easypan.entity.constants.Constants;
 //import com.easypan.entity.dto.DownloadFileDto;
+import com.easypan.entity.dto.DownloadFileDto;
 import com.easypan.entity.enums.FileCategoryEnums;
 import com.easypan.entity.enums.FileFolderTypeEnums;
 import com.easypan.entity.enums.ResponseCodeEnum;
@@ -43,7 +44,7 @@ public class CommonFileController extends ABaseController {
      * @param userId
      * @return
      */
-    public ResponseVO getFolderInfo(String path, String userId) {
+    protected ResponseVO getFolderInfo(String path, String userId) {
         String[] pathArray = path.split("/");
         FileInfoQuery infoQuery = new FileInfoQuery();
         infoQuery.setUserId(userId);
@@ -55,7 +56,7 @@ public class CommonFileController extends ABaseController {
         return getSuccessResponseVO(CopyTools.copyList(fileInfoList, FolderVO.class));
     }
 
-    public void getImage(HttpServletResponse response, String imageFolder, String imageName) {
+    protected void getImage(HttpServletResponse response, String imageFolder, String imageName) {
         if (StringTools.isEmpty(imageFolder) || StringUtils.isBlank(imageName)) {
             return;
         }
@@ -118,7 +119,41 @@ public class CommonFileController extends ABaseController {
         readFile(response, filePath);
     }
 
+    protected ResponseVO createDownloadUrl(String fileId, String userId) {
+        FileInfo fileInfo = fileInfoService.getFileInfoByFileIdAndUserId(fileId, userId);
+        if (fileInfo == null) {
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        if (FileFolderTypeEnums.FOLDER.getType().equals(fileInfo.getFolderType())) {
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        String code = StringTools.getRandomString(Constants.LENGTH_50);
+        DownloadFileDto downloadFileDto = new DownloadFileDto();
+        downloadFileDto.setDownloadCode(code);
+        downloadFileDto.setFilePath(fileInfo.getFilePath());
+        downloadFileDto.setFileName(fileInfo.getFileName());
 
+        redisComponet.saveDownloadCode(code, downloadFileDto);
+
+        return getSuccessResponseVO(code);
+    }
+
+    protected void download(HttpServletRequest request, HttpServletResponse response, String code) throws Exception {
+        DownloadFileDto downloadFileDto = redisComponet.getDownloadCode(code);
+        if (null == downloadFileDto) {
+            return;
+        }
+        String filePath = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE + downloadFileDto.getFilePath();
+        String fileName = downloadFileDto.getFileName();
+        response.setContentType("application/x-msdownload; charset=UTF-8");
+        if (request.getHeader("User-Agent").toLowerCase().indexOf("msie") > 0) {//IE浏览器
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+        } else {
+            fileName = new String(fileName.getBytes("UTF-8"), "ISO8859-1");
+        }
+        response.setHeader("Content-Disposition", "attachment;filename=\"" + fileName + "\"");
+        readFile(response, filePath);
+    }
 //    protected ResponseVO createDownloadUrl(String fileId, String userId) {
 //        FileInfo fileInfo = fileInfoService.getFileInfoByFileIdAndUserId(fileId, userId);
 //        if (fileInfo == null) {

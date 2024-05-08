@@ -624,5 +624,59 @@ public class FileInfoServiceImpl implements FileInfoService {
         }
     }
 
+    /**
+     * 删除
+     * @param userId
+     * @param fileIds
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeFile2RecycleBatch(String userId, String fileIds) {
+        String[] fileIdArray = fileIds.split(",");
+        FileInfoQuery query = new FileInfoQuery();
+        query.setUserId(userId);
+        query.setFileIdArray(fileIdArray);
+        query.setDelFlag(FileDelFlagEnums.USING.getFlag());
+        List<FileInfo> fileInfoList = this.fileInfoMapper.selectList(query);
+        if (fileInfoList.isEmpty()) {
+            return;
+        }
+        List<String> delFilePidList = new ArrayList<>();
+        for (FileInfo fileInfo : fileInfoList) {
+            findAllSubFolderFileIdList(delFilePidList, userId, fileInfo.getFileId(), FileDelFlagEnums.USING.getFlag());
+        }
+        //将目录下的所有文件更新为已删除
+        if (!delFilePidList.isEmpty()) {
+            FileInfo updateInfo = new FileInfo();
+            updateInfo.setDelFlag(FileDelFlagEnums.DEL.getFlag());
+            this.fileInfoMapper.updateFileDelFlagBatch(updateInfo, userId, delFilePidList, null, FileDelFlagEnums.USING.getFlag());
+        }
 
+        //将选中的文件更新为回收站
+        List<String> delFileIdList = Arrays.asList(fileIdArray);
+        FileInfo fileInfo = new FileInfo();
+        fileInfo.setRecoveryTime(new Date());
+        fileInfo.setDelFlag(FileDelFlagEnums.RECYCLE.getFlag());
+        this.fileInfoMapper.updateFileDelFlagBatch(fileInfo, userId, null, delFileIdList, FileDelFlagEnums.USING.getFlag());
+    }
+
+    /**
+     * 递归找出目录下所有文件
+     * @param fileIdList
+     * @param userId
+     * @param fileId
+     * @param delFlag
+     */
+    private void findAllSubFolderFileIdList(List<String> fileIdList, String userId, String fileId, Integer delFlag) {
+        fileIdList.add(fileId);
+        FileInfoQuery query = new FileInfoQuery();
+        query.setUserId(userId);
+        query.setFilePid(fileId);
+        query.setDelFlag(delFlag);
+        query.setFolderType(FileFolderTypeEnums.FOLDER.getType());
+        List<FileInfo> fileInfoList = this.fileInfoMapper.selectList(query);
+        for (FileInfo fileInfo : fileInfoList) {
+            findAllSubFolderFileIdList(fileIdList, userId, fileInfo.getFileId(), delFlag);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.easypan.componet;
 import com.easypan.componet.RedisUtils;
 import com.easypan.entity.constants.Constants;
+import com.easypan.entity.dto.DownloadFileDto;
 import com.easypan.entity.dto.SysSettingsDto;
 import com.easypan.entity.dto.UserSpaceDto;
 import com.easypan.entity.po.FileInfo;
@@ -25,9 +26,30 @@ public class RedisComponet {
         }
         return sysSettingsDto;
     }
+
+    /**
+     * 保存设置
+     * @param userId
+     * @param userSpaceDto
+     */
     public void saveSysSettingDto(String userId, UserSpaceDto userSpaceDto){
         redisUtils.setex(Constants.REDIS_KEY_USER_SPACE_USE+userId,userSpaceDto,Constants.REDIS_KEY_EXPIRES_DAY);
     }
+
+    /**
+     * 保存下载链接时间
+     * @param code
+     * @param downloadFileDto
+     */
+    public void saveDownloadCode(String code, DownloadFileDto downloadFileDto) {
+        redisUtils.setex(Constants.REDIS_KEY_DOWNLOAD + code, downloadFileDto, Constants.REDIS_KEY_EXPIRES_FIVE_MIN);
+    }
+
+    public DownloadFileDto getDownloadCode(String code) {
+        return (DownloadFileDto) redisUtils.get(Constants.REDIS_KEY_DOWNLOAD + code);
+    }
+
+
     public UserSpaceDto getUserSpaceUse(String userId) {
         UserSpaceDto spaceDto = (UserSpaceDto) redisUtils.get(Constants.REDIS_KEY_USER_SPACE_USE + userId);
         if (null == spaceDto) {
@@ -72,4 +94,6 @@ public class RedisComponet {
 
         return 0L;
     }
+
+
 }
