@@ -50,7 +50,7 @@ public class FileInfoController extends CommonFileController {
         query.setOrderBy("last_update_time desc");
         query.setDelFlag(FileDelFlagEnums.USING.getFlag());
         PaginationResultVO result = fileInfoService.findListByPage(query);
-        return getSuccessResponseVO(null);
+        return getSuccessResponseVO(convert2PaginationVO(result, FileInfoVO.class));
     }
     @RequestMapping("/uploadFile")
     @GlobalInterceptor(checkParams = true)
