@@ -230,10 +230,10 @@ public class FileInfoServiceImpl implements FileInfoService {
                 }
                 File newFile = new File(tempFileFolder.getPath() + "/" + chunkIndex);
                 file.transferTo(newFile);
+                //保存临时大小
+                redisComponent.saveFileTempSize(webUserDto.getUserId(),fileId,file.getSize());
                 if (chunkIndex < chunks - 1){
                     resultDto.setStatus(UploadStatusEnums.UPLOADING.getCode());
-                    //保存临时大小
-                    redisComponent.saveFileTempSize(webUserDto.getUserId(),fileId,file.getSize());
                     return resultDto;
                 }
                 //最后一个分片上传完成，记录数据库异步合并封分片
@@ -328,7 +328,7 @@ public class FileInfoServiceImpl implements FileInfoService {
         }
         UserSpaceDto spaceDto = redisComponent.getUserSpaceUse(webUserDto.getUserId());
         spaceDto.setUseSpace(spaceDto.getUseSpace() + totalSize);
-        redisComponent.saveSysSettingDto(webUserDto.getUserId(), spaceDto);
+        redisComponent.saveUserSpaceUse(webUserDto.getUserId(), spaceDto);
     }
 
     /**

@@ -31,4 +31,5 @@ public class Constants {
     public static final String REDIS_KEY_DOWNLOAD = "easypan:download:";
 
     public static final Integer REDIS_KEY_EXPIRES_FIVE_MIN = REDIS_KEY_EXPIRES_ONE_MIN*5;
+    public static final Integer LENGTH_20 = 20;
 }

@@ -196,9 +196,9 @@ public class EmailCodeServiceImpl implements EmailCodeService {
             helper.setTo(toEmail);
             SysSettingsDto sysSettingsDto = redisComponent.getSysSettingDto();
             //邮件标题
-            helper.setSubject(sysSettingsDto.getRegisterMailTitle());
+            helper.setSubject(sysSettingsDto.getRegisterEmailTitle());
             //邮件内容
-            helper.setText(String.format(sysSettingsDto.getRegisterMailContent(),code));
+            helper.setText(String.format(sysSettingsDto.getRegisterEmailContent(),code));
             //邮件发送时间
             helper.setSentDate(new Date());
             javaMailSender.send(message);

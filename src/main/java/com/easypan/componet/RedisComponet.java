@@ -5,8 +5,11 @@ import com.easypan.entity.dto.DownloadFileDto;
 import com.easypan.entity.dto.SysSettingsDto;
 import com.easypan.entity.dto.UserSpaceDto;
 import com.easypan.entity.po.FileInfo;
+import com.easypan.entity.po.UserInfo;
 import com.easypan.entity.query.FileInfoQuery;
+import com.easypan.entity.query.UserInfoQuery;
 import com.easypan.mappers.FileInfoMapper;
+import com.easypan.mappers.UserInfoMapper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -17,6 +20,8 @@ public class RedisComponet {
     private FileInfoMapper<FileInfo, FileInfoQuery> fileInfoMapper;
     @Resource
     private RedisUtils redisUtils;
+    @Resource
+    private UserInfoMapper<UserInfo, UserInfoQuery> userInfoMapper;
 
     public SysSettingsDto getSysSettingDto(){
         SysSettingsDto sysSettingsDto = (SysSettingsDto) redisUtils.get(Constants.REDIS_KEY_SYS_SETTING);
@@ -29,11 +34,11 @@ public class RedisComponet {
 
     /**
      * 保存设置
-     * @param userId
-     * @param userSpaceDto
+     * @param
+     * @param
      */
-    public void saveSysSettingDto(String userId, UserSpaceDto userSpaceDto){
-        redisUtils.setex(Constants.REDIS_KEY_USER_SPACE_USE+userId,userSpaceDto,Constants.REDIS_KEY_EXPIRES_DAY);
+    public void saveSysSettingsDto(SysSettingsDto sysSettingsDto) {
+        redisUtils.set(Constants.REDIS_KEY_SYS_SETTING, sysSettingsDto);
     }
 
     /**
@@ -95,5 +100,14 @@ public class RedisComponet {
         return 0L;
     }
 
+    public UserSpaceDto resetUserSpaceUse(String userId) {
+        UserSpaceDto spaceDto = new UserSpaceDto();
+        Long useSpace = this.fileInfoMapper.selectUseSpace(userId);
+        spaceDto.setUseSpace(useSpace);
 
+        UserInfo userInfo = this.userInfoMapper.selectByUserId(userId);
+        spaceDto.setTotalSpace(userInfo.getTotalSpace());
+        redisUtils.setex(Constants.REDIS_KEY_USER_SPACE_USE + userId, spaceDto, Constants.REDIS_KEY_EXPIRES_DAY);
+        return spaceDto;
+    }
 }

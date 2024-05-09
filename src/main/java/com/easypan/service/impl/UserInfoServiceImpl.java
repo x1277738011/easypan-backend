@@ -21,6 +21,7 @@ import com.easypan.entity.query.FileInfoQuery;
 import com.easypan.exception.BusinessException;
 import com.easypan.mappers.FileInfoMapper;
 import com.easypan.service.EmailCodeService;
+import com.easypan.service.FileInfoService;
 import com.easypan.utils.JsonUtils;
 import com.easypan.utils.OKHttpUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -57,6 +58,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
 	@Resource
 	private AppConfig appConfig;
+
+	@Resource
+	private FileInfoService fileInfoService;
 
 	@Resource
 	private RedisComponet redisComponet;
@@ -285,7 +289,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 		Long useSpace=fileInfoMapper.selectUseSpace(userInfo.getUserId());
 		userSpaceDto.setUseSpace(useSpace);
 		userSpaceDto.setTotalSpace(userInfo.getTotalSpace());
-		redisComponet.saveSysSettingDto(userInfo.getUserId(),userSpaceDto);
+		redisComponet.saveUserSpaceUse(userInfo.getUserId(),userSpaceDto);
 		return sessionWebUserDto;
 	}
 	@Override
@@ -355,7 +359,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 		UserSpaceDto userSpaceDto = new UserSpaceDto();
 		//userSpaceDto.setUseSpace(fileInfoService.getUserUseSpace(user.getUserId()));
 		userSpaceDto.setTotalSpace(user.getTotalSpace());
-		redisComponet.saveSysSettingDto(user.getUserId(), userSpaceDto);
+		redisComponet.saveUserSpaceUse(user.getUserId(), userSpaceDto);
 		return sessionWebUserDto;
 	}
 
@@ -434,4 +438,23 @@ public class UserInfoServiceImpl implements UserInfoService {
 		return null;
 	}
 
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updateUserStatus(String userId, Integer status) {
+		UserInfo userInfo = new UserInfo();
+		userInfo.setStatus(status);
+		if (UserStatusEnum.DISABLE.getStatus().equals(status)) {
+			userInfo.setUseSpace(0L);
+			fileInfoMapper.deleteFileByUserId(userId);
+		}
+		userInfoMapper.updateByUserId(userInfo, userId);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void changeUserSpace(String userId, Integer changeSpace) {
+		Long space = changeSpace * Constants.MB;
+		this.userInfoMapper.updateUserSpace(userId, null, space);
+		redisComponet.resetUserSpaceUse(userId);
+	}
 }
