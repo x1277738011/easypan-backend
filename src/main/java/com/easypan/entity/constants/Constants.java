@@ -32,4 +32,5 @@ public class Constants {
 
     public static final Integer REDIS_KEY_EXPIRES_FIVE_MIN = REDIS_KEY_EXPIRES_ONE_MIN*5;
     public static final Integer LENGTH_20 = 20;
+    public static final String SESSION_SHARE_KEY = "session_share_key_";
 }

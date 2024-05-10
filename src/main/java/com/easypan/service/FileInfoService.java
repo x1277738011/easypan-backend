@@ -78,6 +78,10 @@ public interface FileInfoService {
     void removeFile2RecycleBatch(String userId, String fileIds);
     void recoverFileBatch(String userId, String fileIds);
     void delFileBatch(String userId, String fileIds, Boolean adminOp);
+    void checkRootFilePid(String rootFilePid, String userId, String fileId);
+    void saveShare(String shareRootFilePid, String shareFileIds, String myFolderId, String shareUserId, String cureentUserId);
+    Long getUserUseSpace(@Param("userId") String userId);
+    void deleteFileByUserId(@Param("userId") String userId);
 }
 //    UploadResultDto uploadFile(SessionWebUserDto webUserDto, String fileId, MultipartFile file, String fileName, String filePid, String fileMd5, Integer chunkIndex,
 //                               Integer chunks);

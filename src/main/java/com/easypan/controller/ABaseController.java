@@ -1,5 +1,6 @@
 package com.easypan.controller;
 import com.easypan.entity.constants.Constants;
+import com.easypan.entity.dto.SessionShareDto;
 import com.easypan.entity.dto.SessionWebUserDto;
 import com.easypan.entity.enums.ResponseCodeEnum;
 import com.easypan.entity.vo.PaginationResultVO;
@@ -106,5 +107,10 @@ public class ABaseController {
         resultVO.setPageTotal(result.getPageTotal());
         resultVO.setTotalCount(result.getTotalCount());
         return resultVO;
+    }
+
+    protected SessionShareDto getSessionShareFromSession(HttpSession session, String shareId) {
+        SessionShareDto sessionShareDto = (SessionShareDto) session.getAttribute(Constants.SESSION_SHARE_KEY + shareId);
+        return sessionShareDto;
     }
 }

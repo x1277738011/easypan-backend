@@ -9,7 +9,8 @@ public enum ResponseCodeEnum {
     CODE_500(500, "服务器返回错误，请联系管理员"),
     CODE_901(901, "登陆超时,请重新登陆"),
     CODE_904(904, "网盘空间不足请扩容"),
-    CODE_902(902,"分享失败" );
+    CODE_902(902,"分享链接不存在或已失效" ),
+    CODE_903(903,"分享验证失效，请重新验证" );
 
     private Integer code;
 
